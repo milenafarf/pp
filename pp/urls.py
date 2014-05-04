@@ -24,6 +24,6 @@ urlpatterns = patterns('',
                        url(r'^logowanie/$', views.Signin, name='signin'),
                        url(r'^wspieranie/(?P<pro_id>\d+)/', views.Support, name='support'),
                        url(r'^updateusr/(?P<uid>\d+)/', views.UserUpdate, name='updateusr'),
-                       url(r'^updatecat/(?P<uid>\d+)/', views.CatUpdate, name='updateusr'),
-                       url(r'^updatecom/(?P<uid>\d+)/', views.CommentUpdate, name='updateusr'),
+                       url(r'^updatecat/(?P<uid>\d+)/', views.CatUpdate, name='updatecat'),
+                       url(r'^updatecom/(?P<uid>\d+)/', views.CommentUpdate, name='updatecom'),
 )
