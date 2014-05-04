@@ -72,8 +72,8 @@ def adminUsers(request):
 
 
 def adminCategories(request):
-    # typ = request.sessionp['type']
-    typ = 0
+    typ = request.session['type']
+    # typ = 0
     if(typ == 0):
         template = loader.get_template('admin_categories.html')
         cat_list = Category.objects.all()
@@ -194,6 +194,7 @@ def Signin(request):
         except:
             return redirect('/logowanie')
         request.session['user'] = us.id
+        request.session['type'] = us.type
         return redirect('/')
     else:
         f = forms.Signin
