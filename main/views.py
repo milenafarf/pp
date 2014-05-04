@@ -70,7 +70,9 @@ def adminUsers(request):
 
 def adminCategories(request):
     template = loader.get_template('admin_categories.html')
-    context = RequestContext(request)
+    cat_list = Category.objects.all()
+
+    context = RequestContext(request, {'cats' : cat_list, })
     return HttpResponse(template.render(context))
 
 
