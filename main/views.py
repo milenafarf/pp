@@ -1,13 +1,10 @@
 from datetime import datetime
-from django.db.utils import ConnectionDoesNotExist
 from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
 from main.models import Category, Project, Comment, User, Perk, Donation
 from django.db.models import Q, Count
-from django.http import HttpResponseRedirect
-from django.contrib.sessions.models import Session
 
 def index(request):
     template = loader.get_template('index.html')
@@ -63,18 +60,27 @@ def projects(request):
 
 
 def adminUsers(request):
-    template = loader.get_template('admin_users.html')
-    context = RequestContext(request)
-    return HttpResponse(template.render(context))
+    # typ = request.sessionp['type']
+    typ = 0
+    if(typ == 0):
+        template = loader.get_template('admin_users.html')
+        user_list = User.objects.all()
+        context = RequestContext(request, {'usrs' : user_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('')
 
 
 def adminCategories(request):
-    template = loader.get_template('admin_categories.html')
-    cat_list = Category.objects.all()
-
-    context = RequestContext(request, {'cats' : cat_list, })
-    return HttpResponse(template.render(context))
-
+    # typ = request.sessionp['type']
+    typ = 0
+    if(typ == 0):
+        template = loader.get_template('admin_categories.html')
+        cat_list = Category.objects.all()
+        context = RequestContext(request, {'cats' : cat_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('')
 
 def moderator(request):
     template = loader.get_template('moderator.html')
