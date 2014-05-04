@@ -232,6 +232,7 @@ def Signin(request):
         except:
             return redirect('/logowanie')
         request.session['user'] = us.id
+        request.session['login'] = us.login
         request.session['type'] = us.type
         return redirect('/')
     else:
@@ -296,7 +297,7 @@ def Support(request,pro_id):
 
 def messages(request):
     try:
-        login = request.session['user']
+        login = request.session['login']
         user = User.objects.get(login=login)
         mes_id = request.GET.get('id', '0')
         mesID = int(mes_id)
@@ -326,7 +327,7 @@ def newMessage(request, user_id="0"):
             message.date_created = datetime.now()
             message.user_to = User.objects.get(login=f.cleaned_data['user_to'])
             try:
-                message.user_from = User.objects.get(login=request.session['user'])
+                message.user_from = User.objects.get(login=request.session['login'])
             except:
                 return redirect('/')
             message.save()
@@ -341,7 +342,7 @@ def newMessage(request, user_id="0"):
 
 def message(request, mes_id="0"):
     try:
-        login = request.session['user']
+        login = request.session['login']
         user = User.objects.get(login=login)
         mesID = int(mes_id)
         if mesID > 0:
