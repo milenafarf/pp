@@ -4,7 +4,7 @@ from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
-from main.models import Category, Project, Comment, User, Perk, Donation
+from main.models import Category, Project, Comment, User, Perk, Donation, Message
 from django.db.models import Q, Count
 from django.http import HttpResponseRedirect
 from django.contrib.sessions.models import Session
@@ -248,3 +248,68 @@ def Support(request,pro_id):
     else:
         f = forms.SupportForm
         return render_to_response('support.html', RequestContext(request, {'formset': f}),context)
+
+
+def messages(request):
+    try:
+        login = request.session['user']
+        user = User.objects.get(login=login)
+        mes_id = request.GET.get('id', '0')
+        mesID = int(mes_id)
+        if mesID > 0:
+            try:
+                userTo = User.objects.get(login=login)
+                mes = Message.objects.get(Q(id = mesID) & Q(user_to = userTo))
+                mes.delete()
+            except:
+                bla = "bla"
+        messages_list = Message.objects.filter(user_to = user)
+        template = loader.get_template('messages.html')
+        context = RequestContext(request, {
+        'messages_list': messages_list,
+        })
+        return HttpResponse(template.render(context))
+    except:
+        return redirect('/')
+
+def newMessage(request, user_id="0"):
+    if request.method == 'POST':
+        f = forms.MessageForm(request.POST)
+        if f.is_valid():
+            message = Message()
+            message.subject = f.cleaned_data['subject']
+            message.content = f.cleaned_data['content']
+            message.date_created = datetime.now()
+            message.user_to = User.objects.get(login=f.cleaned_data['user_to'])
+            try:
+                message.user_from = User.objects.get(login=request.session['user'])
+            except:
+                return redirect('/')
+            message.save()
+        return redirect('/')
+    else:
+        f = forms.MessageForm
+        userID = int(user_id)
+        if userID > 0:
+            user = User.objects.get(id=userID)
+            f = forms.MessageForm(initial={'user_to' : user.login})
+        return render_to_response('new_message.html', RequestContext(request, {'formset': f}))
+
+def message(request, mes_id="0"):
+    try:
+        login = request.session['user']
+        user = User.objects.get(login=login)
+        mesID = int(mes_id)
+        if mesID > 0:
+            try:
+                userTo = User.objects.get(login=login)
+                mes = Message.objects.get(id = mesID, user_to = userTo)
+                template = loader.get_template('message.html')
+                context = RequestContext(request, {
+                'message': mes,
+                })
+                return HttpResponse(template.render(context))
+            except:
+                return redirect('/')
+    except:
+        return redirect('/')

@@ -8,5 +8,6 @@ urlpatterns = patterns('',
     # url(r'^$', 'pp.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^$', 'main.views.index'),
+    #url(r'^$', 'main.views.new_message'),
     (r'^register/$','main.views.register'),
 )
