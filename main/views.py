@@ -377,7 +377,9 @@ def CommentUpdate(request, uid=-1):
         return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
 
 def CatUpdate(request, uid=-1):
-    us = Category.objects.get(id=int(uid))
+    us = None
+    if uid != -1:
+      us = Category.objects.get(id=int(uid))
     form = UserCategoryForm(request.POST or None, instance=us)
     if form.is_valid():
         form.save()
