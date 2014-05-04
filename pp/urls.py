@@ -20,4 +20,8 @@ urlpatterns = patterns('',
     url(r'^addcoment/(?P<pro_id>\d+)/', views.addcoment, name='addcoment'),
     url(r'^logowanie/$', views.Signin, name='signin'),
     url(r'^wspieranie/(?P<pro_id>\d+)/', views.Support, name='support'),
+    url(r'^newMessage/(?P<user_id>\d+)/', views.newMessage, name='newMessage'),
+    url(r'^newMessage/', views.newMessage, name='newMessage'),
+    url(r'^messages/', views.messages, name='messages'),
+    url(r'^message/(?P<mes_id>\d+)/', views.message, name='message'),
 )
