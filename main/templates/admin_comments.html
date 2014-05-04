@@ -5,7 +5,7 @@
 Panel admina
 {% endblock %}
 {% block content %}
-<a href="#" class="btn"><span class="glyphicon glyphicon-plus"></span> dodaj nową kategorię</a>
+
 <table class="table table-hover table-bordered table-condensed" style="background-color: white;">
     <tr>
         <th>
@@ -13,7 +13,7 @@ Panel admina
         </th>
 
         <th>
-            Treść
+            Tytuł
         </th>
 
         <th>
@@ -24,22 +24,22 @@ Panel admina
             Usuwanie
         </th>
     </tr>
-    {% for cat in cats %}
+    {% for com in coms%}
     <tr>
         <td>
-            {{ cat.id }}
+            {{ com.id }}
         </td>
 
         <td>
-            {{ cat.name }}
+            {{ com.content }}
         </td>
 
         <td>
-            <a href="{% url 'updatecat' cat.id %}" class="btn"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a href="{% url 'updatecom' com.id %}" class="btn"><span class="glyphicon glyphicon-pencil"></span></a>
         </td>
 
         <td>
-            <a href="{% url 'delcat' cat.id %}" class="btn"><span class="glyphicon glyphicon-remove"></span></a>
+            <a href="{% url 'delcom' com.id %}" class="btn"><span class="glyphicon glyphicon-remove"></span></a>
         </td>
     </tr>
     {% endfor %}

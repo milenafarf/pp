@@ -1,15 +1,13 @@
 from datetime import datetime
-from django.db.utils import ConnectionDoesNotExist
+import decimal
 from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
 from main.models import Category, Project, Comment, User, Perk, Donation, Message
+from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm
 from django.db.models import Q, Count
-from django.http import HttpResponseRedirect
-from django.contrib.sessions.models import Session
-import decimal
-from decimal import Decimal
+
 
 def index(request):
     template = loader.get_template('index.html')
@@ -65,15 +63,61 @@ def projects(request):
 
 
 def adminUsers(request):
-    template = loader.get_template('admin_users.html')
-    context = RequestContext(request)
-    return HttpResponse(template.render(context))
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ in {0, 1}):
+        template = loader.get_template('admin_users.html')
+        user_list = User.objects.all()
+        context = RequestContext(request, {'usrs' : user_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('/')
+
+def adminProjects(request):
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ in {0, 1}):
+        template = loader.get_template('admin_projects.html')
+        pro_list = Project.objects.all()
+        context = RequestContext(request, {'pros' : pro_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('/')
+
+def adminComments(request):
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ in {0, 1}):
+        template = loader.get_template('admin_comments.html')
+        com_list = Comment.objects.all()
+        context = RequestContext(request, {'coms' : com_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('/')
 
 
 def adminCategories(request):
-    template = loader.get_template('admin_categories.html')
-    context = RequestContext(request)
-    return HttpResponse(template.render(context))
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ == 0):
+        template = loader.get_template('admin_categories.html')
+        cat_list = Category.objects.all()
+        context = RequestContext(request, {'cats' : cat_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('/')
 
 
 def moderator(request):
@@ -313,3 +357,47 @@ def message(request, mes_id="0"):
                 return redirect('/')
     except:
         return redirect('/')
+
+def UserUpdate(request, uid=-1):
+    us = User.objects.get(id=int(uid))
+    form = UserUpdateForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
+
+def CommentUpdate(request, uid=-1):
+    us = Comment.objects.get(id=int(uid))
+    form = UserCommentForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
+
+def CatUpdate(request, uid=-1):
+    us = Category.objects.get(id=int(uid))
+    form = UserCategoryForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
+
+def delUser(request, uid):
+    User.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
+def delCat(request, uid):
+    Category.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
+def delCom(request, uid):
+    Comment.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
+def delPro(request, uid):
+    Project.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
