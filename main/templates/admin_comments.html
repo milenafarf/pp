@@ -1,18 +1,21 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 {% extends "base.html" %}
 
 {% block title %}
 Panel admina
 {% endblock %}
 {% block content %}
+
 <table class="table table-hover table-bordered table-condensed" style="background-color: white;">
     <tr>
-        <th>ID</th>
-        <th>Login</th>
-        <th>Email</th>
-        <th>Ban</th>
-        <th>Uprawnienia</th>
+        <th>
+            ID
+        </th>
+
+        <th>
+            Tytuł
+        </th>
+
         <th>
             Edycja
         </th>
@@ -21,26 +24,14 @@ Panel admina
             Usuwanie
         </th>
     </tr>
-    {% for cat in usrs %}
+    {% for com in coms%}
     <tr>
         <td>
-            {{ cat.id }}
-
+            {{ com.id }}
         </td>
 
         <td>
-            {{ cat.login }}
-        </td>
-
-        <td>
-            {{ cat.email}}
-        </td>
-
-        <td>
-            {{ cat.ban}}
-        </td>
-        <td>
-            {{ cat.type}}
+            {{ com.content }}
         </td>
 
         <td>
@@ -53,5 +44,4 @@ Panel admina
     </tr>
     {% endfor %}
 </table>
-Uprawnienia: 0 - admin; 1 - mod; 0 - user
 {% endblock %}

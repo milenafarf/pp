@@ -3,11 +3,9 @@ from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
+from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm
 from main.models import Category, Project, Comment, User, Perk, Donation
 from django.db.models import Q, Count
-from django.http import HttpResponseRedirect
-from django.contrib.sessions.models import Session
-from decimal import Decimal
 
 
 def index(request):
@@ -64,27 +62,62 @@ def projects(request):
 
 
 def adminUsers(request):
-    # typ = request.sessionp['type']
-    typ = 0
-    if(typ == 0):
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ in {0, 1}):
         template = loader.get_template('admin_users.html')
         user_list = User.objects.all()
         context = RequestContext(request, {'usrs' : user_list, })
         return HttpResponse(template.render(context))
     else:
-        return redirect('')
+        return redirect('/')
+
+def adminProjects(request):
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ in {0, 1}):
+        template = loader.get_template('admin_projects.html')
+        pro_list = Project.objects.all()
+        context = RequestContext(request, {'pros' : pro_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('/')
+
+def adminComments(request):
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
+    if(typ in {0, 1}):
+        template = loader.get_template('admin_comments.html')
+        com_list = Comment.objects.all()
+        context = RequestContext(request, {'coms' : com_list, })
+        return HttpResponse(template.render(context))
+    else:
+        return redirect('/')
 
 
 def adminCategories(request):
-    typ = request.session['type']
-    # typ = 0
+    typ = 2
+    try:
+        typ = request.session['type']
+    except KeyError:
+        pass
     if(typ == 0):
         template = loader.get_template('admin_categories.html')
         cat_list = Category.objects.all()
         context = RequestContext(request, {'cats' : cat_list, })
         return HttpResponse(template.render(context))
     else:
-        return redirect('')
+        return redirect('/')
+
 
 def moderator(request):
     template = loader.get_template('moderator.html')
@@ -258,3 +291,30 @@ def Support(request,pro_id):
     else:
         f = forms.SupportForm
         return render_to_response('support.html', RequestContext(request, {'formset': f}),context)
+
+def UserUpdate(request, uid=-1):
+    us = User.objects.get(id=int(uid))
+    form = UserUpdateForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
+
+def CommentUpdate(request, uid=-1):
+    us = Comment.objects.get(id=int(uid))
+    form = UserCommentForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
+
+def CatUpdate(request, uid=-1):
+    us = Category.objects.get(id=int(uid))
+    form = UserCategoryForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))

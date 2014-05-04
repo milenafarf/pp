@@ -51,3 +51,15 @@ class SupportForm(forms.ModelForm):
             'amount' :('Kwota')
         }
 amount=forms.DecimalField(label='Kwota', widget=forms.NumberInput)
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+
+class UserCommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+
+class UserCategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
