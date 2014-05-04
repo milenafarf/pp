@@ -2,24 +2,28 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Projekt
+Projekt
 {% endblock %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}user.css">
 <div>
-<h2>nazwa projektu</h2>
-tu bedzie tresc
+    <h2>nazwa projektu</h2>
+    tu bedzie tresc
 </div>
 Komentarze:
 {% for com in coms %}
 <div class="panel panel-default">
-  <div class="panel-heading"><b>{{ com.user.login }}</b> napisał/a dnia {{ com.date_created}}</div>
-  <div class="panel-body">
-    {{ com.content }}
-  </div>
+    <div class="panel-heading"><b>{{ com.user.login }}</b> napisał/a dnia {{ com.date_created}}
+        <a href="{% url 'updatecom' com.id %}" class="btn"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a href="{% url 'delcom' com.id %}" class="btn"><span class="glyphicon glyphicon-remove"></span></a>
+    </div>
+    <div class="panel-body">
+        {{ com.content }}
+    </div>
 </div>
 {% empty %}
 Nie ma żadnych komentarzy dla tego projektu
 {% endfor %}
-<div><a href="{% url 'addcoment' proid %}" class="btn btn-primary" role="button" style="width:100%"><h4>Dodaj komentarz</h4></a></div>
+<div><a href="{% url 'addcoment' proid %}" class="btn btn-primary" role="button" style="width:100%"><h4>Dodaj
+    komentarz</h4></a></div>
 {% endblock %}

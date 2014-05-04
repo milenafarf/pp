@@ -26,4 +26,8 @@ urlpatterns = patterns('',
                        url(r'^updateusr/(?P<uid>\d+)/', views.UserUpdate, name='updateusr'),
                        url(r'^updatecat/(?P<uid>\d+)/', views.CatUpdate, name='updatecat'),
                        url(r'^updatecom/(?P<uid>\d+)/', views.CommentUpdate, name='updatecom'),
+                       url(r'^delusr/(?P<uid>\d+)/', views.delUser, name='delusr'),
+                       url(r'^delcom/(?P<uid>\d+)/', views.delCom, name='delcom'),
+                       url(r'^delcat/(?P<uid>\d+)/', views.delCat, name='delcat'),
+                       url(r'^delpro/(?P<uid>\d+)/', views.delPro, name='delpro'),
 )

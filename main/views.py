@@ -318,3 +318,19 @@ def CatUpdate(request, uid=-1):
         return redirect('/')
     else:
         return render_to_response('updateCat.html', RequestContext(request, {'formset': form}))
+
+def delUser(request, uid):
+    User.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
+def delCat(request, uid):
+    Category.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
+def delCom(request, uid):
+    Comment.objects.get(id=int(uid)).delete()
+    return redirect('/')
+
+def delPro(request, uid):
+    Project.objects.get(id=int(uid)).delete()
+    return redirect('/')
