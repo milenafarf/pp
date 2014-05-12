@@ -1,9 +1,13 @@
 from datetime import datetime
+import os
+from django.core.context_processors import request
+from django.db.utils import ConnectionDoesNotExist
 import decimal
 from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
+from main.models import Category, Project, Comment, User, Atachment,Perk
 from main.models import Category, Project, Comment, User, Perk, Donation, Message
 from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm
 from django.db.models import Q, Count
@@ -191,39 +195,144 @@ def UserRegister(request):
     else:
         return render_to_response('register.html', context)
 
-
 def AddNewProject(request):
-    f = forms.ProjectRegisterForm(prefix='project')
-    fr = forms.ProjectPerks(prefix='perk')
-    context = RequestContext(request, {'formset': f, 'form1': fr})
-    if request.method == 'POST':
-        f = forms.ProjectRegisterForm(request.POST, prefix='project')
-        fr = forms.ProjectPerks(request.POST, prefix='perk')
-        if f.is_valid():
-            p = Project()
-            p.title = f.cleaned_data['title']
-            p.short_description = f.cleaned_data['short_description']
-            p.funding_goal = f.cleaned_data['funding_goal']
-            p.full_description = f.cleaned_data['description']
-            p.category = f.cleaned_data['category']
-            p.user_id = 1
-            Project.save(p)
-            return redirect('/', request)
-    else:
-        return render_to_response('AddNewProject.html', context)
 
+    if 'login' in request.session:
+            user=User.objects.get(login=request.session['login'])
+            f = forms.ProjectRegisterForm(prefix='project')
+            fr = forms.ProjectPerks(prefix='perk')
+            context = RequestContext(request, {'formset': f, 'form1': fr})
+            if request.method == 'POST':
+                f = forms.ProjectRegisterForm(request.POST, prefix='project')
+                p = Project()
+                if(f.is_valid()):
+                    p.title = f.cleaned_data['title']
+                    p.short_description = f.cleaned_data['short_description']
+                    p.funding_goal = f.cleaned_data['funding_goal']
+                    p.full_description = f.cleaned_data['description']
+                    p.category = f.cleaned_data['category']
+                    p.user =user
+                    Project.save(p)
+                    if (request.FILES.getlist('file')!=""):
+                        if(not os.path.exists(p.title)):
+                            os.mkdir(p.title)
+                        for file in request.FILES.getlist('file'):
+                            l = open(p.title+'\\'+file.name, 'wb+')
+                            for chunk in file.chunks():
+                                l.write(chunk)
+                            l.close()
+                            atachment=Atachment()
+                            atachment.url=p.title+'\\'+file.name
+                            atachment.project=p
+                            Atachment.save(atachment)
+                    for urlfile in request.POST.getlist('urlfile'):
+                        atachment=Atachment()
+                        atachment.url=urlfile
+                        atachment.project=p
+                        Atachment.save(atachment)
+                    j=0
+                    perkvalue=Perk()
+                    for perk in request.POST.getlist('perk'):
+
+                        if j==0:
+                            perkvalue.project=p
+                            perkvalue.title= perk
+                            j+=1
+                        elif j==1:
+                            perkvalue.description=perk
+                            j+=1
+                        elif j==2:
+                            j+=1
+                            perkvalue.amount= int(perk)
+                        else:
+                            j=0
+                            if int(perk)>0:
+                                perkvalue.number_available=int(perk)
+                            perkvalue.save()
+                            perkvalue=Perk()
+                return redirect('/', request)
+            else:
+                return render_to_response('AddNewProject.html', context)
+    else:
+        return redirect('/logowanie', request)
 
 def EditProject(request, project_id):
-    f = forms.ProjectRegisterForm()
-    context = RequestContext(request, {'formset': f})
+
+    proj=Project.objects.get(id=int(project_id))
+    f = forms.ProjectRegisterForm(prefix='project',initial={'title':proj.title,'category':proj.category,'description':proj.full_description,'short_description':proj.short_description,'funding_goal':proj.funding_goal })
+    fr = forms.ProjectPerks(prefix='perk')
+    atachments=Atachment.objects.filter(project=proj)
+    perks=Perk.objects.filter(project=proj).order_by('amount')
+    context = RequestContext(request, {'formset': f, 'form1': fr,'atachments':atachments,'perks':perks,'projectid':proj.id})
     if request.method == 'POST':
-        f = forms.ProjectRegisterForm(request.POST)
-        if f.is_valid():
-            f.save()
         return redirect('/', request)
-    return
-
-
+    return render_to_response('EditProject.html',context)
+def saveeditedproject(request,project_id):
+    if 'login' in request.session:
+        if request.method == 'POST':
+            user=User.objects.get(login=request.session['login'])
+            f = forms.ProjectRegisterForm(request.POST, prefix='project')
+            p = Project.objects.get(id=project_id)
+            if(f.is_valid()):
+                p.title = f.cleaned_data['title']
+                p.short_description = f.cleaned_data['short_description']
+                p.funding_goal = f.cleaned_data['funding_goal']
+                p.full_description = f.cleaned_data['description']
+                p.category = f.cleaned_data['category']
+                p.user =user
+                p.save()
+                for removedperk in request.POST.getlist('removedperk'):
+                    Perk.objects.get(id=int(removedperk))
+                for removedatachment in request.POST.getlist('removedatachment'):
+                    atachment=Atachment.objects.get(id=int(removedatachment))
+                    if atachment.url.startswith('http') or atachment.url.__contains__('www'):
+                        atachment.delete()
+                    else:
+                        os.remove(atachment.url)
+                        atachment.delete()
+                if (request.FILES.getlist('file')!=""):
+                    if(not os.path.exists(p.title)):
+                        os.mkdir(p.title)
+                    for file in request.FILES.getlist('file'):
+                        l = open(p.title+'\\'+file.name, 'wb+')
+                        for chunk in file.chunks():
+                            l.write(chunk)
+                        l.close()
+                        atachment=Atachment()
+                        atachment.url=p.title+'\\'+file.name
+                        atachment.project=p
+                        Atachment.save(atachment)
+                for urlfile in request.POST.getlist('urlfile'):
+                    atachment=Atachment()
+                    atachment.url=urlfile
+                    atachment.project=p
+                    Atachment.save(atachment)
+                j=0
+                perkvalue=Perk()
+                for perk in request.POST.getlist('perk'):
+                    if j==0:
+                        perkvalue.project=p
+                        perkvalue.title= perk
+                        j+=1
+                    elif j==1:
+                        perkvalue.description=perk
+                        j+=1
+                    elif j==2:
+                        j+=1
+                        perkvalue.amount= int(perk)
+                    else:
+                        j=0
+                        if int(perk)>0:
+                            perkvalue.number_available=int(perk)
+                        perkvalue.save()
+                        perkvalue=Perk()
+                return redirect('/', request)
+            else:
+                return redirect('/editproject/'+str(project_id)+'/',request)
+        else:
+            return redirect('/', request)
+    else:
+        return redirect('/logowanie', request)
 def Signin(request):
     if request.method == 'POST':
         c = forms.Signin(request.POST)

@@ -41,13 +41,18 @@ class Project(models.Model):
     def __str__(self):  # Python 3: def __str__(self):
         return self.title
 
+class Atachment(models.Model):
+    url=models.CharField(max_length=200)
+    project=models.ForeignKey(Project)
+    def __str__(self):
+        return self.url
 
 class Perk(models.Model):
     # poziomy wsparcia projektu i przewidziane nagrody za wsparcie taka suma pieniedzy
     amount = models.DecimalField(max_digits=8, decimal_places=2)  #ilosc pieniedzy w danym poziomie
     title = models.CharField(max_length=80)  #tytul, nazwa poziomu
     description = models.TextField()  #opis poziomu
-    number_available = models.IntegerField(blank=True)  #blank=True znaczy, ze wartosc moze byc null
+    number_available = models.IntegerField(null=True,blank=True)  #blank=True znaczy, ze wartosc moze byc null
     #jesli amount=null, to liczba danej nagrody za wsparcie jest nieograniczona
     project = models.ForeignKey(Project)
     def __str__(self):  # Python 3: def __str__(self):
