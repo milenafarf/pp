@@ -7,8 +7,43 @@ Projekt
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}user.css">
 <div>
-    <h2>nazwa projektu</h2>
-    tu bedzie tresc
+    <h2>{{ project.title }}</h2>
+    <br>
+    <br>
+    <div id="description">
+       {{ description }}
+        <br>
+        {%for atachment in atachments %}
+            {% if 'youtube' in atachment.url %}
+                <embed
+                width="420" height="345"
+                src="{{ atachment.url }}"
+                type="application/x-shockwave-flash">
+                </embed>
+            {% elif 'jpg' in atachment.url %}
+                <img src="{{atachment.url}}" alt="załącznik">
+            {% else %}
+                <a href="{{ atachment.url }}">{{atachment.url}}</a>
+            {% endif %}
+
+        {% endfor %}
+    </div>
+    <div id="perks">
+        {% for perk in perks %}
+            <div class="projectviewperk">
+            <h4>{{perk.title}}</h4>
+            {{ perk.amount }}
+            <br>
+            {{ perk.description }}
+            <br>
+            {% if perk.number_available %}
+                Ilość pozostałych nagród: {{ perk.number_available }}
+            {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    Projekt odwiedzilo już: {{ project.visit_counter }}
+    Ocena: {{ project.rating }}
 </div>
 Komentarze:
 {% for com in coms %}
