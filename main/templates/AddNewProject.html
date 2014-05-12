@@ -3,7 +3,7 @@
 Nowy projekt
 {% endblock %}
 {% block content %}
-    <div xmlns="http://www.w3.org/1999/html">
+    <div xmlns="http://www.w3.org/1999/html" style="overflow: auto">
     <h1>Nowy projekt</h1>
         <form method="post" enctype="multipart/form-data" action="">
             {% csrf_token %}
@@ -85,7 +85,7 @@ Nowy projekt
             <label>Pełny opis projektu:</label>
             {{ formset.description}}
             <div>
-                <div id="fulldescription"></div>
+                <div id="fulldescription" class="summernote"></div>
             </div>
             <h3>Załączniki</h3>
             <table style="width: 100%">

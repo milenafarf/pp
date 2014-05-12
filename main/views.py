@@ -167,8 +167,15 @@ def projects(request, cat_id="0"):
 def project(request, pro_id):
     template = loader.get_template('project.html')
     pro = Project.objects.get(id=int(pro_id))
+    if request.method=='GET':
+        i=int(pro.visit_counter)
+        i=i+1
+        pro.visit_counter=i
+        pro.save()
+    atachments=Atachment.objects.filter(project=pro)
+    perks=Perk.objects.filter(project=pro).order_by('amount')
     coms = Comment.objects.filter(project=pro).order_by('-date_created')
-    context = RequestContext(request, {'coms': coms, 'proid': str(pro_id)})
+    context = RequestContext(request, {'coms': coms, 'proid': str(pro_id),'project': pro,'atachments': atachments,'perks': perks})
     return HttpResponse(template.render(context))
 
 

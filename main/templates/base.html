@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
     <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"/>
-    <link href="http://oss.maxcdn.com/summernote/0.5.1/summernote.css" rel="stylesheet">
-    <script src="http://oss.maxcdn.com/summernote/0.5.1/summernote.min.js"></script>
+    <link href="{{ STATIC_URL }}summernote.css" rel="stylesheet">
+    <script src="{{ STATIC_URL }}summernote.js"></script>
     <link rel="Stylesheet" type="text/css" href="{{ STATIC_URL }}base.css"/>
 </head>
 
@@ -45,7 +45,6 @@
 
     <div class="col-md-2">
         <div class="btn-group-vertical">
-
             <a href="{% url 'projects' %}" class=" btn btn-primary btn-lg active" role="button"
                style="font-size: 17px;">Projekty</button></a>
             <a href="{% url 'categories' %}" class=" btn btn-info btn-lg active" role="button" style="font-size: 14px;">Kategorie</button></a>

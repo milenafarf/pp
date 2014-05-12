@@ -93,7 +93,7 @@ Edytuj projekt
             <label>Pełny opis projektu:</label>
             {{ formset.description}}
             <div>
-                <div id="fulldescription"></div>
+                <div id="fulldescription" class="summernote"></div>
             </div>
             <h3>Załączniki</h3>
             <table style="width: 100%">
@@ -133,7 +133,14 @@ Edytuj projekt
         </form>
     </div>
     <script type="text/javascript">
-    var a=function(){ $('#id_project-description').val($('#fulldescription').code()) };
+    $(document).onmousemove=function()
+    {
+        $scrollbar.css('overflow', 'visible');
+    }
+
+    var a=function(){ $('#id_project-description').val($('#fulldescription').code());
+
+    };
     $(document).ready(function() {
           $('#fulldescription').summernote({
               height: 450,
@@ -144,7 +151,7 @@ Edytuj projekt
           giftamountchange();
           perkvaluechange('#perk','#perkvalue');
           valuechange();
-          $('#fulldescription').code($('#id_project-description').val());
+          $('#fulldescription').code($('#id_project-description').html());
     });
     var valuechange=function(){$('#goal').val($('#id_project-funding_goal').val());}
     var perkvaluechange=function(a,b){$(a).val($(b).val());}
