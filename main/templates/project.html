@@ -8,7 +8,9 @@ Projekt
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}user.css">
 <div>
     <h2>{{ project.title }}</h2>
-    <br>
+    {% if request.session.user %}
+        <a href="{% url 'addobserved' proid %}" class="btn"><span class="glyphicon glyphicon-plus"></span>Obserwuj</a>
+    {% endif %}
     <br>
     <div id="description">
        {{ description }}

@@ -550,3 +550,23 @@ def notices(request):
         return redirect('/')
     return render_to_response('notices.html', RequestContext(request, {'zakonczone': zakonczone, 'komentarze':komentarze, 'zakonczoneObs':zakonczoneObs, 'komentarzeObs':komentarzeObs,
                                                                        'wsparte': wsparte, 'wplaty':wplaty}))
+
+def observed(request):
+    userID = int(request.session['user'])
+    user = User.objects.get(id=userID)
+    observedList = ObservedProject.objects.filter(user=user)
+    return render_to_response('observed.html', RequestContext(request, {'pros' : observedList}))
+
+def addobserved(request, proid):
+    ob = ObservedProject()
+    userID = int(request.session['user'])
+    user = User.objects.get(id=userID)
+    ob.user = user
+    pro = Project.objects.get(id=int(proid))
+    ob.project = pro
+    ob.save()
+    return redirect('/project/' + proid)
+
+def delobserved(request, id):
+    ObservedProject.objects.get(id=int(id)).delete()
+    return redirect('/observed/')
