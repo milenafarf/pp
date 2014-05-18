@@ -16,6 +16,41 @@ font-color: black;
 #przycisk{
 color: black;
 }
+
 .note-editable{
     background-color: white;
+}
+
+.otoczka
+{
+    color: #010101;
+    background: #19b6f8;
+    padding: 10px;
+    border:2px solid;
+    border-radius:15px;
+}
+
+.zakonczone
+{
+    color: #fbca1c;
+    background: #0680f8;
+    padding: 10px;
+    border:2px solid;
+    border-radius:5px;
+}
+.komentarze
+{
+    color: #3d2cfb;
+    background: #00f866;
+    padding: 10px;
+    border:2px solid;
+    border-radius:5px;
+}
+.wplaty
+{
+    color: #3d2cfb;
+    background: #f0f878;
+    padding: 10px;
+    border:2px solid;
+    border-radius:5px;
 }

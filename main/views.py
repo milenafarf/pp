@@ -2,13 +2,13 @@ from datetime import datetime
 import os
 from django.core.context_processors import request
 from django.db.utils import ConnectionDoesNotExist
+from datetime import datetime, timedelta
 import decimal
 from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
-from main.models import Category, Project, Comment, User, Atachment,Perk
-from main.models import Category, Project, Comment, User, Perk, Donation, Message
+from main.models import Category, Project, Comment, User, Perk, Atachment, Donation, Message, ObservedProject
 from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm
 from django.db.models import Q, Count
 
@@ -520,3 +520,33 @@ def delPro(request, uid):
     Project.objects.get(id=int(uid)).delete()
     return redirect('/')
 
+def logout(request):
+    del request.session["user"]
+    del request.session["login"]
+    del request.session["type"]
+    request.session.modified = True
+    return redirect('/')
+
+def notices(request):
+    try:
+        userID = int(request.session['user'])
+        user = User.objects.get(id=userID)
+        now = datetime.now().date()
+        zakonczone = Project.objects.filter(Q(deadline__lte=now) & Q(user=user)).order_by('deadline')
+        for zakonczony in zakonczone:
+            wplaty = Donation.objects.filter(project=zakonczony)
+            setattr(zakonczony, 'liczbaWplat', wplaty.count())
+        last_week = datetime.today() - timedelta(days=7)
+        komentarze = Comment.objects.filter(Q(project__user=user) & Q(date_created__gte=last_week)).order_by('date_created')[:10]
+        zakonczoneObs = ObservedProject.objects.filter(Q(user=user) & Q(project__deadline__lte=now)).order_by('project__deadline')
+        komentarzeObs = list()
+        obserwowane = ObservedProject.objects.filter(user=user)
+        for obserwowany in obserwowane:
+            kom = Comment.objects.filter(Q(project=obserwowany.project) & Q(date_created__gte=last_week))[:3]
+            komentarzeObs.extend(kom)
+        wsparte = Donation.objects.filter(Q(user=user) & Q(project__deadline__lte=now))
+        wplaty = Donation.objects.filter(Q(project__user=user) & Q(date__gte=last_week))
+    except:
+        return redirect('/')
+    return render_to_response('notices.html', RequestContext(request, {'zakonczone': zakonczone, 'komentarze':komentarze, 'zakonczoneObs':zakonczoneObs, 'komentarzeObs':komentarzeObs,
+                                                                       'wsparte': wsparte, 'wplaty':wplaty}))
