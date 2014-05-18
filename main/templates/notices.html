@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}
+    Powiadomienia
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}user.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}base.css">
+    <br>
+    <div class="otoczka">
+        <b>Twoje projekty:</b>
+        <br><br>
+        {% for zakonczony in zakonczone %}
+            <div class="zakonczone">
+                Twój projekt <b><i>{{ zakonczony.title }}</i></b> zakończył się dnia {{ zakonczony.deadline }}.<br/>
+                Zebrano <b>{{ zakonczony.money_raised }}zł</b> z planowanych <b>{{ zakonczony.funding_goal }}zł</b>.<br>
+                Dokonano wpłat:  <b>{{ zakonczony.liczbaWplat }}</b>.
+            </div>
+        {% endfor %}
+        <br>
+        {% for komentarz in komentarze %}
+            <div class="komentarze">
+                Użytkownik <b>{{ komentarz.user.login }}</b> skomentował Twój projekt <b><i>{{ komentarz.project.title }}</i></b> dnia {{ komentarz.date_created }}:<br>
+                {{ komentarz.content }}
+            </div>
+        {% endfor %}
+        <br>
+        {% for wplata in wplaty %}
+            <div class="wplaty">
+                Użytkownik <b>{{ wplata.user.login }}</b> wsparł Twój projekt <b><i>{{ wplata.project.title }}</i></b> dnia {{ wplata.date }} na kwotę {{ wplata.amount }}
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <div class="otoczka">
+        <b>Obserwowane projekty:</b>
+        <br><br>
+        {% for zakonczonyObs in zakonczoneObs %}
+            <div class="zakonczone">
+                Obserwowany projekt <b><i>{{ zakonczonyObs.project.title }}</i></b> zakończył się dnia {{ zakonczonyObs.project.deadline }}.<br/>
+                Zebrano <b>{{ zakonczonyObs.project.money_raised }}zł</b> z planowanych <b>{{ zakonczonyObs.project.funding_goal }}zł</b>.<br>
+            </div>
+        {% endfor %}
+        <br>
+        {% for komentarzObs in komentarzeObs %}
+            <div class="komentarze">
+                Użytkownik <b>{{ komentarzObs.user.login }}</b> skomentował obserowany przec Ciebie projekt <b><i>{{ komentarzObs.project.title }}</i></b> dnia {{ komentarzObs.date_created }}:<br>
+                {{ komentarzObs.content }}
+            </div>
+        {% endfor %}
+    </div>
+    <br>
+    <div class="otoczka">
+        <b>Wsparte projekty:</b>
+        <br><br>
+        {% for wsparty in wsparte %}
+            <div class="zakonczone">
+                Wsparty przez Ciebie projekt <b><i>{{ wsparty.project.title }}</i></b> zakończył się dnia {{ wsparty.project.deadline }}.<br/>
+                Zebrano <b>{{ wsparty.project.money_raised }}zł</b> z planowanych <b>{{ wsparty.project.funding_goal }}zł</b>.<br>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
