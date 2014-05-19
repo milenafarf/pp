@@ -19,7 +19,7 @@
         </tr>
         {% for project in projects_list %}
             <tr>
-                <td><a href="">{{ project.title }}</a></td>
+                <td><a href="{% url 'project' project.id %}">{{ project.title }}</a></td>
                 <td>{{ project.date_created }}</td>
                 <td><a href="{% url 'projects' project.category.id %}">{{ project.category.name }}</a></td>
                 <td>{{ project.user.login }}</td>

@@ -8,7 +8,14 @@ Projekt
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}user.css">
 <div>
     <h2>{{ project.title }}</h2>
-    <br>
+    {% if request.session.user %}
+        {% if obs = False %}
+            <a href="{% url 'addobserved' proid %}" class="btn"><span class="glyphicon glyphicon-plus"></span>Obserwuj</a>
+        {% endif %}
+        {% if obs = True%}
+            <a href="{% url 'delobservedp' proid %}" class="btn"><span class="glyphicon glyphicon-minus"></span>Przestań obserwować</a>
+        {% endif %}
+    {% endif %}
     <br>
     <div id="description">
        {{ description }}

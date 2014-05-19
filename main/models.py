@@ -84,7 +84,7 @@ class Donation(models.Model):
     project = models.ForeignKey(Project)
     user = models.ForeignKey(User)
     perk = models.ForeignKey(Perk)
-    def __str__(self):  # Python 3: def __str__(self):
+    def __str__(self):
         return str(self.amount)
 
 class ObservedProject(models.Model):

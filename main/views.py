@@ -1,7 +1,4 @@
-from datetime import datetime
 import os
-from django.core.context_processors import request
-from django.db.utils import ConnectionDoesNotExist
 from datetime import datetime, timedelta
 import decimal
 from main import forms
@@ -167,6 +164,16 @@ def projects(request, cat_id="0"):
 def project(request, pro_id):
     template = loader.get_template('project.html')
     pro = Project.objects.get(id=int(pro_id))
+    obs = False
+    obsId = 0
+    login = request.session['login']
+    user = User.objects.get(login=login)
+    try:
+        o = ObservedProject.objects.get(user=user, project=pro)
+        obsId = o.id
+        obs = True
+    except:
+        pass
     if request.method=='GET':
         i=int(pro.visit_counter)
         i=i+1
@@ -175,7 +182,8 @@ def project(request, pro_id):
     atachments=Atachment.objects.filter(project=pro)
     perks=Perk.objects.filter(project=pro).order_by('amount')
     coms = Comment.objects.filter(project=pro).order_by('-date_created')
-    context = RequestContext(request, {'coms': coms, 'proid': str(pro_id),'project': pro,'atachments': atachments,'perks': perks})
+    context = RequestContext(request, {'coms': coms, 'proid': str(pro_id),'project': pro,'atachments': atachments,
+                                       'perks': perks, 'obs' : obs, 'obsid' : obsId})
     return HttpResponse(template.render(context))
 
 
@@ -550,3 +558,30 @@ def notices(request):
         return redirect('/')
     return render_to_response('notices.html', RequestContext(request, {'zakonczone': zakonczone, 'komentarze':komentarze, 'zakonczoneObs':zakonczoneObs, 'komentarzeObs':komentarzeObs,
                                                                        'wsparte': wsparte, 'wplaty':wplaty}))
+
+def observed(request):
+    userID = int(request.session['user'])
+    user = User.objects.get(id=userID)
+    observedList = ObservedProject.objects.filter(user=user)
+    return render_to_response('observed.html', RequestContext(request, {'pros' : observedList}))
+
+def addobserved(request, proid):
+    ob = ObservedProject()
+    userID = int(request.session['user'])
+    user = User.objects.get(id=userID)
+    ob.user = user
+    pro = Project.objects.get(id=int(proid))
+    ob.project = pro
+    ob.save()
+    return redirect('/project/' + proid)
+
+def delobserved(request, id):
+    ObservedProject.objects.get(id=int(id)).delete()
+    return redirect('/observed/')
+
+def delobservedp(request, proid):
+    userID = int(request.session['user'])
+    user = User.objects.get(id=userID)
+    pro = Project.objects.get(id=int(proid))
+    ObservedProject.objects.get(user=user, project=pro).delete()
+    return redirect('/project/' + proid)

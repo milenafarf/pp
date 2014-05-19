@@ -50,7 +50,7 @@
             <a href="{% url 'projects' %}" class=" btn btn-primary btn-lg active" role="button"
                style="font-size: 17px;">Projekty</button></a>
             <a href="{% url 'categories' %}" class=" btn btn-info btn-lg active" role="button" style="font-size: 14px;">Kategorie</button></a>
-            <a href="{% url 'categories' %}" class=" btn btn-info btn-lg active" role="button" style="font-size: 14px;">Obserwowne</button></a>
+            <a href="{% url 'observed' %}" class=" btn btn-info btn-lg active" role="button" style="font-size: 14px;">Obserwowne</button></a>
             {% if request.session.user %}
             <a href="{% url 'categories' %}" class=" btn btn-info btn-lg active" role="button" style="font-size: 14px;">Utwórz
                 nowy</button></a>
