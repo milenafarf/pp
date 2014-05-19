@@ -5,33 +5,32 @@
 Projekt
 {% endblock %}
 {% block content %}
+
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}user.css">
 <div>
     <h2>{{ project.title }}</h2>
     {% if request.session.user %}
-        {% if obs = False %}
+        {% if obs == False %}
             <a href="{% url 'addobserved' proid %}" class="btn"><span class="glyphicon glyphicon-plus"></span>Obserwuj</a>
         {% endif %}
-        {% if obs = True%}
+        {% if obs == True%}
             <a href="{% url 'delobservedp' proid %}" class="btn"><span class="glyphicon glyphicon-minus"></span>Przestań obserwować</a>
         {% endif %}
     {% endif %}
     <br>
     <div id="description">
-       {{ description }}
-        <br>
+        {{ project.full_description|safe }}
+    </div>
+    <div>
         {%for atachment in atachments %}
-            {% if 'youtube' in atachment.url %}
-                <embed
-                width="420" height="345"
-                src="{{ atachment.url }}"
-                type="application/x-shockwave-flash">
-                </embed>
+            {% if 'youtube.com' in atachment.url %}
+               <iframe width="420" height="315" src="//www.youtube.com/embed/{{atachment.url|slice:"32:"}}" frameborder="0" allowfullscreen></iframe>
             {% elif 'jpg' in atachment.url %}
                 <img src="{{atachment.url}}" alt="załącznik">
             {% else %}
                 <a href="{{ atachment.url }}">{{atachment.url}}</a>
             {% endif %}
+            <br>
 
         {% endfor %}
     </div>
@@ -39,7 +38,7 @@ Projekt
         {% for perk in perks %}
             <div class="projectviewperk">
             <h4>{{perk.title}}</h4>
-            {{ perk.amount }}
+            Kwota progu: {{ perk.amount }}
             <br>
             {{ perk.description }}
             <br>
@@ -49,8 +48,32 @@ Projekt
             </div>
         {% endfor %}
     </div>
-    Projekt odwiedzilo już: {{ project.visit_counter }}
-    Ocena: {{ project.rating }}
+    Projekt odwiedzilo już: {{ project.visit_counter|add:'1' }}
+    <div id="rating">
+    {% if request.session.login %}
+        {% if userrate %}
+        Ocena projektu:
+        <nobr>
+                <img id="star0" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="1" >
+                <img id="star1" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="2" >
+                <img id="star2" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="3" >
+                <img id="star3" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="4" >
+                <img id="star4" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="5" >
+        </nobr><br>
+        {% else  %}
+                Oceń:
+                <nobr>
+                <img id="star0" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="1" onmouseover="starsmouseover(1);" onclick="starsclick(1);">
+                <img id="star1" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="2" onmouseover="starsmouseover(2);" onclick="starsclick(2);">
+                <img id="star2" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="3" onmouseover="starsmouseover(3);" onclick="starsclick(3);">
+                <img id="star3" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="4" onmouseover="starsmouseover(4);" onclick="starsclick(4);">
+                <img id="star4" width="20" height="20" src="{{ STATIC_URL }}emptystarr.png" alt="5" onmouseover="starsmouseover(5);" onclick="starsclick(5);">
+                </nobr><br>
+        {% endif %}
+    {%else%}
+         Aby oceniń projekt zaloguj się
+    {% endif %}
+    </div>
 </div>
 Komentarze:
 {% for com in coms %}
@@ -68,4 +91,37 @@ Nie ma żadnych komentarzy dla tego projektu
 {% endfor %}
 <div><a href="{% url 'addcoment' proid %}" class="btn btn-primary" role="button" style="width:100%"><h4>Dodaj
     komentarz</h4></a></div>
+<script>
+$('#document').ready(function()
+{
+    $.ajax({
+        url: "/visitors/{{ project.id }}/",
+        context: document.body
+    });
+    {% if request.session.login and userrate %}
+        starsmouseover({{ rating }});
+    {% endif %}
+
+});
+var starsmouseover=function(starid){
+    var i=parseInt(starid);
+    for(var j=0;j<i;j++){
+        $('#star'+ j.toString()).attr("src","{{ STATIC_URL }}fillstar.jpg");
+    }
+    for(var j=i ;j<5;j++)
+    {
+        $('#star'+ j.toString()).attr("src","{{ STATIC_URL }}emptystarr.png");
+    }
+};
+var starsclick=function(starid){
+    $.ajax({
+        url: "/rate/{{ project.id }}/"+starid+"/",
+        context: document.body,
+    success: function(html) {
+        $('#rating').html(html);
+    }});
+};
+
+
+</script>
 {% endblock %}

@@ -33,7 +33,6 @@ class Project(models.Model):
         auto_now_add=True)  #Automatically set the field to now when the object is first created. Useful for creation of timestamps
     last_update = models.DateTimeField(
         auto_now=True)  #Automatically set the field to now every time the object is saved. Useful for 'last-modified' timestamps
-    rating = models.IntegerField(default=0) #ocena projektu
     ban = models.BooleanField(default=False)
     visit_counter = models.IntegerField(default=0)
     category = models.ForeignKey(Category)
@@ -46,7 +45,12 @@ class Atachment(models.Model):
     project=models.ForeignKey(Project)
     def __str__(self):
         return self.url
-
+class Rating(models.Model):
+    rating = models.IntegerField(default=0)
+    user=models.ForeignKey(User)
+    project=models.ForeignKey(Project)
+    def __str__(self):
+        return self.project.title
 class Perk(models.Model):
     # poziomy wsparcia projektu i przewidziane nagrody za wsparcie taka suma pieniedzy
     amount = models.DecimalField(max_digits=8, decimal_places=2)  #ilosc pieniedzy w danym poziomie

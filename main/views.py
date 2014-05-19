@@ -1,12 +1,14 @@
 import os
 from datetime import datetime, timedelta
+from django.core.context_processors import request
+from django.db.utils import ConnectionDoesNotExist
 import decimal
 from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
-from main.models import Category, Project, Comment, User, Perk, Atachment, Donation, Message, ObservedProject
-from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm, UserForm
+from main.models import Category, Project, Comment, User, Perk, Atachment, Donation, Message, ObservedProject, Rating
+from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm, UserForm,MessageForm
 from django.db.models import Q, Count
 
 
@@ -166,24 +168,43 @@ def project(request, pro_id):
     pro = Project.objects.get(id=int(pro_id))
     obs = False
     obsId = 0
-    login = request.session['login']
-    user = User.objects.get(login=login)
-    try:
-        o = ObservedProject.objects.get(user=user, project=pro)
-        obsId = o.id
-        obs = True
-    except:
-        pass
-    if request.method=='GET':
-        i=int(pro.visit_counter)
-        i=i+1
-        pro.visit_counter=i
-        pro.save()
     atachments=Atachment.objects.filter(project=pro)
     perks=Perk.objects.filter(project=pro).order_by('amount')
+    rating=0
+    login=False
+    try:
+        login=request.session['login']
+    except:
+        login=False
+        pass
+    if login:
+        user = User.objects.get(login=request.session['login'])
+        try:
+            o = ObservedProject.objects.get(user=user, project=pro)
+            obsId = o.id
+            obs = True
+        except:
+            pass
+        try:
+            userrate = Rating.objects.get(Q(project__id=pro.id) & Q(user__id=user.id))
+        except Rating.DoesNotExist:
+            userrate = None
+        try:
+            rates=Rating.objects.filter(Q(project__id=int(pro.id)))
+        except:
+            rates=None
+        i=int(rates.__len__())
+        rating=0
+        for rate in rates:
+            rating+=rate.rating
+        if i!=0:
+            rating = rating/i
+            rating = int(rating)
+    else:
+        userrate=False
     coms = Comment.objects.filter(project=pro).order_by('-date_created')
     context = RequestContext(request, {'coms': coms, 'proid': str(pro_id),'project': pro,'atachments': atachments,
-                                       'perks': perks, 'obs' : obs, 'obsid' : obsId})
+                                       'perks': perks, 'obs' : obs, 'obsid' : obsId,'userrate': userrate,'rating':rating})
     return HttpResponse(template.render(context))
 
 
@@ -528,6 +549,46 @@ def delPro(request, uid):
     Project.objects.get(id=int(uid)).delete()
     return redirect('/')
 
+
+def visitors(request,project_id):
+    p=Project.objects.get(id=project_id)
+    p.visit_counter=p.visit_counter+1
+    p.save()
+    return HttpResponse('')
+
+
+def rate(request, project_id, rate):
+    p=Project.objects.get(id=project_id)
+    user=User.objects.get(login=request.session['login'])
+    r=Rating()
+    r.rating=rate
+    r.user=user
+    r.project=p
+    r.save()
+    try:
+            rates=Rating.objects.filter(Q(project__id=int(p.id)))
+    except:
+            rates=None
+    j=int(rates.__len__())
+    rating=0
+    for rate in rates:
+        rating+=rate.rating
+    if j!=0:
+        rating = rating/j
+    rating = int(rating)
+
+    html='Ocena:<nobr>'
+    for i in range(1,6):
+        if i>int(rating):
+            print(i)
+            html += '<img width=\"20\" height=\"20\" src=\"/static/emptystarr.png\" >'
+        else:
+            print(i)
+            html += '<img width=\"20\" height=\"20\" src=\"/static/fillstar.jpg\"  >'
+    html+='</nobr><br>'
+    print(html)
+    return HttpResponse(html)
+
 def logout(request):
     del request.session["user"]
     del request.session["login"]
@@ -597,3 +658,4 @@ def editUser(request):
         return redirect('/')
     else:
         return render_to_response('user.html', RequestContext(request, {'formset': form}))
+
