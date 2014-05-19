@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
 from main.models import Category, Project, Comment, User, Perk, Atachment, Donation, Message, ObservedProject
-from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm
+from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm, UserForm
 from django.db.models import Q, Count
 
 
@@ -585,3 +585,15 @@ def delobservedp(request, proid):
     pro = Project.objects.get(id=int(proid))
     ObservedProject.objects.get(user=user, project=pro).delete()
     return redirect('/project/' + proid)
+
+def editUser(request):
+    us = None
+    user_id = request.session['user']
+    if user_id != -1:
+        us = User.objects.get(id=user_id)
+        form = UserForm(request.POST or None, instance=us)
+    if form.is_valid():
+        form.save()
+        return redirect('/')
+    else:
+        return render_to_response('user.html', RequestContext(request, {'formset': form}))

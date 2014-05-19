@@ -63,3 +63,8 @@ class UserCommentForm(forms.ModelForm):
 class UserCategoryForm(forms.ModelForm):
     class Meta:
         model = Category
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields=('email', 'password',)
