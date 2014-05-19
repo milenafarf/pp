@@ -9,7 +9,12 @@ Projekt
 <div>
     <h2>{{ project.title }}</h2>
     {% if request.session.user %}
-        <a href="{% url 'addobserved' proid %}" class="btn"><span class="glyphicon glyphicon-plus"></span>Obserwuj</a>
+        {% if obs = False %}
+            <a href="{% url 'addobserved' proid %}" class="btn"><span class="glyphicon glyphicon-plus"></span>Obserwuj</a>
+        {% endif %}
+        {% if obs = True%}
+            <a href="{% url 'delobservedp' proid %}" class="btn"><span class="glyphicon glyphicon-minus"></span>Przestań obserwować</a>
+        {% endif %}
     {% endif %}
     <br>
     <div id="description">
