@@ -1,7 +1,6 @@
 from django import forms
 from main.models import User, Comment, Category, User, Perk
 from django.core.exceptions import ObjectDoesNotExist
-import re
 from django.core import validators
 
 
@@ -68,3 +67,8 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields=('email', 'password',)
+
+class MessageForm(forms.Form):
+    subject = forms.CharField(label='Tytuł', max_length=80, widget=forms.TextInput(attrs={'size': '80'}))
+    user_to = forms.CharField(label='Odbiorca', max_length=50, widget=forms.TextInput(attrs={'size': '80'}))
+    content = forms.CharField(label='Treść', widget=forms.Textarea(attrs={'cols' : '80'}))
