@@ -7,7 +7,7 @@ from main import forms
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 from django.template import loader, RequestContext
-from main.models import Category, Project, Comment, User, Perk, Atachment, Donation, Message, ObservedProject, Rating
+from main.models import Category, Project, Comment, User, Perk, Atachment, Donation, Message, ObservedProject, Rating,DailyVisit
 from main.forms import UserUpdateForm, UserCommentForm, UserCategoryForm, UserForm,MessageForm
 from django.db.models import Q, Count
 
@@ -553,7 +553,16 @@ def delPro(request, uid):
 def visitors(request,project_id):
     p=Project.objects.get(id=project_id)
     p.visit_counter=p.visit_counter+1
+    today = datetime.today()
     p.save()
+    try:
+        TodayVisitors = DailyVisit.objects.get(project=p, day=today)
+        TodayVisitors.visitors=TodayVisitors.visitors+1
+        TodayVisitors.save()
+    except:
+        TodayVisitors = DailyVisit(project=p, day=today)
+        TodayVisitors.visitors=1
+        TodayVisitors.save()
     return HttpResponse('')
 
 

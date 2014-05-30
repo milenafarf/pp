@@ -28,7 +28,7 @@ class Project(models.Model):
     full_description = models.TextField()  #pelny opis projektu
     funding_goal = models.DecimalField(max_digits=8, decimal_places=2)  #ilosc pieniedzy planowanych do zebrania
     money_raised = models.DecimalField(default=0, max_digits=8, decimal_places=2)  #ilosc pieniedzy juz zebranych
-    deadline = models.DateField(default=datetime.date.today)  #data zakonczenia projektu
+    deadline = models.DateField(default=datetime.date(datetime.date.today().year, datetime.date.today().month+1, datetime.date.today().day))  #data zakonczenia projektu
     date_created = models.DateTimeField(
         auto_now_add=True)  #Automatically set the field to now when the object is first created. Useful for creation of timestamps
     last_update = models.DateTimeField(
@@ -51,6 +51,12 @@ class Rating(models.Model):
     project=models.ForeignKey(Project)
     def __str__(self):
         return self.project.title
+
+class DailyVisit(models.Model):
+    day=models.DateField(default=datetime.date.today)
+    visitors = models.IntegerField(default=0)
+    project=models.ForeignKey(Project)
+
 class Perk(models.Model):
     # poziomy wsparcia projektu i przewidziane nagrody za wsparcie taka suma pieniedzy
     amount = models.DecimalField(max_digits=8, decimal_places=2)  #ilosc pieniedzy w danym poziomie
