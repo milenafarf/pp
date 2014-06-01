@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}
+    Statystyki
+{% endblock %}
+{% block content %}
+    {% load chart_tags %}
+    {% chart %}
+        chxr=0,0,160
+        chbh=a
+        chs=700x220
+        cht=lc
+        chf=bg,s,f1f877
+        chxs=0,0000DD,13,-1,lt,FF0000|1,0000DD,13,-1,lt,FF0000
+        chco=FF0000
+        chds=0,{{ liczbaWplatMax }}
+        chd=t:{{ liczbaWplatDane }}
+        chtt=Liczba+wsparć+z+ostatniego+miesiąca
+        chxt=x,y
+        chxl=0:|{{ liczbaWplatLabel }}|1:|0|{{ liczbaWplatMax }}
+    {% endchart %}
+    <br/><br/>
+    {% chart %}
+        chxr=0,0,160
+        chbh=a
+        chs=700x220
+        cht=lc
+        chf=bg,s,f1f877
+        chxs=0,0000DD,13,-1,lt,FF0000|1,0000DD,13,-1,lt,FF0000
+        chco=00FF00
+        chds=0,{{ kwotaWplatMax }}
+        chd=t:{{ kwotaWplatDane }}
+        chtt=Kwota+wsparć+z+ostatniego+miesiąca
+        chxt=x,y
+        chxl=0:|{{ kwotaWplatLabel }}|1:|0|{{ kwotaWplatMax }}
+    {% endchart %}
+    <br/><br/>
+    {% chart %}
+        chxr=0,0,160
+        chbh=a
+        chs=700x220
+        cht=lc
+        chf=bg,s,f1f877
+        chxs=0,0000DD,13,-1,lt,FF0000|1,0000DD,13,-1,lt,FF0000
+        chco=0000FF
+        chds=0,{{ wizytyMax }}
+        chd=t:{{ wizytyDane }}
+        chtt=Wyświetlenia+w+ostatnim+miesiącu
+        chxt=x,y
+        chxl=0:|{{ wizytyLabel }}|1:|0|{{ wizytyMax }}
+    {% endchart %}
+{% endblock %}

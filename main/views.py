@@ -1,4 +1,5 @@
 import os
+import array
 from datetime import datetime, timedelta
 from django.core.context_processors import request
 from django.db.utils import ConnectionDoesNotExist
@@ -668,3 +669,68 @@ def editUser(request):
     else:
         return render_to_response('user.html', RequestContext(request, {'formset': form}))
 
+def stats(request, pro_id):
+    last_month = datetime.today() - timedelta(days=30)
+    now = datetime.today()
+    projectID = int(pro_id)
+    project = Project.objects.get(id=projectID)
+    liczbaWplatLista = array.array('i',(0 for i in range(0,31)))
+    liczbaWplatMax = int(0)
+    for x in range(0, 31):
+        data=last_month + timedelta(days=x)
+        liczbaWplatWDniu = Donation.objects.filter(Q(project=project) & Q(date__gte=data) & Q(date__lt=data + timedelta(days=1)))
+        liczbaWplatLista[x] = liczbaWplatWDniu.count()
+        if liczbaWplatWDniu.count() > liczbaWplatMax:
+            liczbaWplatMax = liczbaWplatWDniu.count()
+    liczbaWplatLabel = str()
+    liczbaWplatLabel += str(last_month.day) + '-' + str(last_month.month) + '-' + str(last_month.year)
+    for x in range(0, 30):
+        liczbaWplatLabel += "|"
+    liczbaWplatLabel += str(now.day) + '-' + str(now.month) + '-' + str(now.year)
+    liczbaWplatDane = str()
+    for liczba in liczbaWplatLista:
+        liczbaWplatDane += str(liczba) + ","
+    liczbaWplatDane = liczbaWplatDane[:-1]
+
+    kwotaWplatLista = array.array('i',(0 for i in range(0,31)))
+    kwotaWplatMax = int(0)
+    for x in range(0, 31):
+        kwotaWplatLista[x] = int(0)
+        data=last_month + timedelta(days=x)
+        kwotaWplatWDniu = Donation.objects.filter(Q(project=project) & Q(date__gte=data) & Q(date__lt=data + timedelta(days=1)))
+        for wparcie in kwotaWplatWDniu:
+            kwotaWplatLista[x] = kwotaWplatLista[x] + wparcie.amount
+        if kwotaWplatLista[x] > kwotaWplatMax:
+            kwotaWplatMax = kwotaWplatLista[x]
+    kwotaWplatLabel = str()
+    kwotaWplatLabel += str(last_month.day) + '-' + str(last_month.month) + '-' + str(last_month.year)
+    for x in range(0, 30):
+        kwotaWplatLabel += "|"
+    kwotaWplatLabel += str(now.day) + '-' + str(now.month) + '-' + str(now.year)
+    kwotaWplatDane = str()
+    for kwota in kwotaWplatLista:
+        kwotaWplatDane += str(kwota) + ","
+    kwotaWplatDane = kwotaWplatDane[:-1]
+
+    wizytyLista = array.array('i',(0 for i in range(0,31)))
+    wizytyMax = int(0)
+    for x in range(0, 31):
+        wizytyLista[x] = int(0)
+        data=last_month + timedelta(days=x)
+        if DailyVisit.objects.filter(Q(project=project) & Q(day=data)).count() > 0:
+            wizytyWDniu = DailyVisit.objects.get(Q(project=project) & Q(day=data))
+            wizytyLista[x] = wizytyWDniu.visitors
+            if wizytyLista[x] > wizytyMax:
+               wizytyMax = wizytyLista[x]
+    wizytyLabel = str()
+    wizytyLabel += str(last_month.day) + '-' + str(last_month.month) + '-' + str(last_month.year)
+    for x in range(0, 30):
+        wizytyLabel += "|"
+    wizytyLabel += str(now.day) + '-' + str(now.month) + '-' + str(now.year)
+    wizytyDane = str()
+    for wizyty in wizytyLista:
+        wizytyDane += str(wizyty) + ","
+    wizytyDane = wizytyDane[:-1]
+    return render_to_response('stats.html', RequestContext(request, {'liczbaWplatLabel': liczbaWplatLabel, 'liczbaWplatDane':liczbaWplatDane, 'liczbaWplatMax': liczbaWplatMax,
+                                                                     'kwotaWplatLabel': kwotaWplatLabel, 'kwotaWplatDane':kwotaWplatDane, 'kwotaWplatMax': kwotaWplatMax,
+                                                                     'wizytyLabel': wizytyLabel, 'wizytyDane':wizytyDane, 'wizytyMax': wizytyMax}))
