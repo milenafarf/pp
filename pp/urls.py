@@ -47,4 +47,5 @@ urlpatterns = patterns('',
 			           url(r'^editUser/', views.editUser, name='editUser'),
                        url(r'^visitors/(?P<project_id>\d+)/', views.visitors, name='visitors'),
                        url(r'^rate/(?P<project_id>\d+)/(?P<rate>\d+)/', views.rate, name='rate'),
+                       url(r'^stats/(?P<pro_id>\d+)/', views.stats, name='stats'),
 )
